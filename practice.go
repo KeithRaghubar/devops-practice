@@ -1,11 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
 	"os"
 	"regexp"
+	"runtime"
+	"time"
 )
 
 type Page struct {
@@ -17,10 +20,26 @@ var templates = template.Must(template.ParseFiles("edit.html", "view.html"))
 var validPath = regexp.MustCompile("^/(edit|save|view)/([a-zA-Z0-9]+)$")
 
 func main() {
+	// fmt.Println("test")
+	go listen()
+	// fmt.Println("test2")
+
+	ticker := time.NewTicker(time.Second)
+	var stats runtime.MemStats
+	for {
+		select {
+		case <-ticker.C:
+			runtime.ReadMemStats(&stats)
+			fmt.Printf("Memory Usage: %vkB\n", stats.Sys/1000)
+
+		}
+	}
+}
+
+func listen() {
 	http.HandleFunc("/view/", makeHandler(viewHandler))
 	http.HandleFunc("/edit/", makeHandler(editHandler))
 	http.HandleFunc("/save/", makeHandler(saveHandler))
-
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
