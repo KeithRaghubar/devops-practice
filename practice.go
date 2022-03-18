@@ -16,7 +16,11 @@ type Page struct {
 	Body  []byte
 }
 
-var templates = template.Must(template.ParseFiles("edit.html", "view.html"))
+const projectRoot = "/home/keithraghubar/go/src/devopsPractice/"
+const templatesDir = projectRoot + "templates/"
+const pagesDir = projectRoot + "pages/"
+
+var templates = template.Must(template.ParseFiles(templatesDir+"edit.html", templatesDir+"view.html"))
 var validPath = regexp.MustCompile("^/(edit|save|view)/([a-zA-Z0-9]+)$")
 
 func main() {
@@ -44,12 +48,12 @@ func listen() {
 }
 
 func (p *Page) save() error {
-	filename := p.Title + ".txt"
+	filename := pagesDir + p.Title + ".txt"
 	return os.WriteFile(filename, p.Body, 0600)
 }
 
 func loadPage(title string) (*Page, error) {
-	filename := title + ".txt"
+	filename := pagesDir + title + ".txt"
 	body, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
